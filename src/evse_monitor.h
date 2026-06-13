@@ -136,6 +136,9 @@ class EvseMonitor : public MicroTasks::Task
     Temperature _temps[EVSE_MONITOR_TEMP_COUNT];
     EnergyMeter _energyMeter;
 
+    int _relay1;
+    int _relay2;
+
     // Default OpenEVSE Fault Counters
     long _gfci_count;
     long _nognd_count;
@@ -264,6 +267,14 @@ class EvseMonitor : public MicroTasks::Task
     double getPower() {
       return _power;
     }
+
+    int getRelay1() {
+      return _relay1;
+    }
+    int getRelay2() {
+      return _relay2;
+    }
+
     uint32_t getSessionElapsed() {
       return _energyMeter.getElapsed();
     }

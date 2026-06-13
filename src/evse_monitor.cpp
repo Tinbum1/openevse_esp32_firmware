@@ -836,19 +836,27 @@ void EvseMonitor::getChargeCurrentAndVoltageFromEvse()
 {
   if(_state.isCharging())
   {
-    DBUGLN("Get charge current/voltage status");
-    _openevse.getChargeCurrentAndVoltage([this](int ret, double a, double volts)
+    DBUGLN("Get charge current/voltage status and relay energy flags");
+    _openevse.getChargeCurrentAndVoltage([this](int ret, double a, double volts, int relay1, int relay2)
     {
       if(RAPI_RESPONSE_OK == ret)
       {
-        DBUGF("amps = %.2f, volts = %.2f", a, volts);
+        DBUGF("amps = %.2f, volts = %.2f, relay1 = %d, relay2 = %d", a, volts, relay1, relay2);
         _amp = a;
         if(VOLTAGE_MINIMUM <= volts && volts <= VOLTAGE_MAXIMUM) {
           _voltage = volts;
         }
+
+                //Save the relay flags to your class member variables
+                _relay1 = relay1;
+                _relay2 = relay2;
+
         _power = _amp * _voltage;
         if (config_threephase_enabled()) {
-          _power = _power * 3;
+                  if (relay1 != 0 && relay2 != 0){
+                    _power = _power * 3;}
+                  else if (relay1 != 0 || relay2 != 0) {
+                    _power = _power * 2;}
         }
 
         StaticJsonDocument<64> event;
